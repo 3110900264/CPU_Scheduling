@@ -408,6 +408,10 @@ public class Gui extends JPanel{
                     JOptionPane.showMessageDialog(null,"挂起队列为空！无法解挂！" ,"提示",JOptionPane.PLAIN_MESSAGE);
                 }
                 else{
+                    if(count2 == 6){
+                        JOptionPane.showMessageDialog(null,"就绪队列已满！无法解挂！" ,"提示",JOptionPane.PLAIN_MESSAGE);
+                    }
+                    else{
                     count4 = 0;
                     jiuxu.add(guaqi.get(0));
                     count2 ++;
@@ -430,6 +434,7 @@ public class Gui extends JPanel{
                         textArea6.append("        " + jiuxu.get(i).Rank + "        ");
                     }
                 }
+            }
             }
         });
         panel.add(label18);
