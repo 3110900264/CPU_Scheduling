@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Gui extends JPanel{
     //创建队列对应数组
@@ -14,12 +15,15 @@ public class Gui extends JPanel{
     ArrayList<process> guaqi = new ArrayList<process>();
     ArrayList<process> CPU = new ArrayList<process>();
     ArrayList<process> zhongzhi = new ArrayList<process>();
+    ArrayList<process> neicun = new ArrayList<process>();
 
     int count1 = 0;//对应后备队列指针
     int count2 = 0;//对应就绪队列指针
     int count3 = 0;//对应终止队列指针
     int count4 = 0;//对应是否对就绪队列中元素完成排序
-    int count5 = 0;//对于挂起队列指针
+    int count5 = 0;//对应挂起队列指针
+    int count6 = 1;//对应已经占用的内存大小
+
 
     //初始化设置窗口
     public Gui(){
@@ -73,20 +77,58 @@ public class Gui extends JPanel{
         JLabel label23 = new JLabel("进程名");
         JTextArea textArea11 = new JTextArea(5,10);
         JButton button7 = new JButton("排序");
+        JLabel label24 = new JLabel("占用内存:");
+        JTextField textField7 = new JTextField(4);
+        JLabel label25 = new JLabel("模拟内存");
+        JLabel label26 = new JLabel("PS: 模拟内存共16KB，其中操作系统占用1KB");
 
+        Font font = new Font("宋体", Font.BOLD, 25);
+        Font font1 = new Font("宋体", 0, 20);
+
+        //内存管理
+        Object[] columnNames = {"进程名","起址","长度"};
+        Object[][] data = {
+                {"  进程名","   起址","   长度"},
+                {"操作系统",0,1},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""},
+                {"","",""}
+        };
+        JTable table = new JTable(data, columnNames);
+        table.setBounds(1250,60,300,650);
+        table.setFont(font1);
+        table.setShowGrid(true);
+        table.setRowHeight(37);
+        table.setRowHeight(0,58);
+        table.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        label25.setFont(font);
+        label25.setBorder(BorderFactory.createRaisedSoftBevelBorder());
+        label25.setBounds(1340,0,110,45);
+        panel.add(table);
+        panel.add(label25);
 
         //总窗口设置
         panel.setBackground(Color.lightGray);
         panel.setLayout(null);
-        panel.setPreferredSize(new Dimension(1150, 870));
+        panel.setPreferredSize(new Dimension(1650, 870));
         frame.add(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setBounds(70,80,1150, 870);
+        frame.setBounds(70,80,1650, 870);
         frame.setVisible(true);
 
         //创建进程模块设置
-        Font font = new Font("宋体", Font.BOLD, 25);
-        Font font1 = new Font("宋体", 0, 20);
         label1.setFont(font);
         label1.setBorder(BorderFactory.createRaisedSoftBevelBorder());
         label1.setBounds(170,0,110,45);
@@ -96,34 +138,70 @@ public class Gui extends JPanel{
         label3.setBounds(150,50,100,30);
         label4.setFont(font1);
         label4.setBounds(320,50,100,30);
+        label24.setFont(font1);
+        label24.setBounds(150,100,100,30);
+        label26.setFont(font1);
+        label26.setBounds(10,150,500,30);
         textField1.setBounds(75,50,50,30);
         textField1.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         textField2.setBounds(250,50,50,30);
         textField2.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         textField3.setBounds(400,50,50,30);
         textField3.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        button1.setBounds(120,100,70,35);
+        textField7.setBounds(250,100,50,30);
+        textField7.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        button1.setBounds(120,200,70,35);
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {//添加队列添加按钮实现
-                houbei.add(new process(textField1.getText(),Integer.parseInt(textField2.getText()),Integer.parseInt(textField3.getText())));
-                process temp = houbei.get(count1);
-                count1++;
-                String name = temp.PID;
-                int time = temp.Time;
-                int rank = temp.Rank;
-                textArea1.append("       " + name + "       ");
-                textArea2.append("        " + time + "         ");
-                textArea3.append("        " + rank + "         ");
+                int n = Integer.parseInt(textField7.getText());
+                int lenth = 0;
+                if(Integer.parseInt(textField7.getText()) > 16-count6) {
+                    JOptionPane.showMessageDialog(null,"进程所占用内存超过剩余内存！无法添加进程！","提示",JOptionPane.PLAIN_MESSAGE);
+                }
+                else {
+                    for(int i = 0;i <= 16;i++){
+                        if(table.getModel().getValueAt(i,2) == ""){
+                            lenth+=1;
+                            if(lenth == Integer.parseInt(textField7.getText())){
+                                houbei.add(new process(textField1.getText(), Integer.parseInt(textField2.getText()), Integer.parseInt(textField3.getText()), Integer.parseInt(textField7.getText())));
+                                process temp = houbei.get(count1);
+                                count1++;
+                                String name = temp.PID;
+                                int time = temp.Time;
+                                int rank = temp.Rank;
+                                textArea1.append("       " + name + "       ");
+                                textArea2.append("        " + time + "         ");
+                                textArea3.append("        " + rank + "         ");
+                                table.getModel().setValueAt(textField1.getText(),i+1-lenth,0);
+                                table.getModel().setValueAt(i-lenth,i+1-lenth,1);
+                                table.getModel().setValueAt(1,i+1-lenth,2);
+                                for(int j = 0;j < lenth-1;j++){
+                                    table.getModel().setValueAt(j+2,i+2+j-lenth,2);
+                                }
+                                count6+=lenth;
+                                lenth = 0;
+                                break;
+                            }
+                            if(i==16){
+                                JOptionPane.showMessageDialog(null,"无合适内存空间存放进程！","提示",JOptionPane.PLAIN_MESSAGE);
+                            }
+                        }
+                        else {
+                         lenth = 0 ;
+                        }
+                    }
+                }
             }
         });
-        button2.setBounds(300,100,70,35);
+        button2.setBounds(300,200,70,35);
         button2.addActionListener(new ActionListener() {//添加队列时清空按钮实现
             @Override
             public void actionPerformed(ActionEvent e) {
                 textField1.setText("");
                 textField2.setText("");
                 textField3.setText("");
+                textField7.setText("");
             }
         });
         panel.add(label1);
@@ -135,7 +213,9 @@ public class Gui extends JPanel{
         panel.add(textField3);
         panel.add(button1);
         panel.add(button2);
-
+        panel.add(label24);
+        panel.add(textField7);
+        panel.add(label26);
 
 
         //后备队列模块设置
@@ -288,7 +368,18 @@ public class Gui extends JPanel{
                             jiuxu.remove(0);
                             count2--;
                             textArea11.append("       " + zhongzhi.get(count3-1).PID + "       ");
-                            JOptionPane.showMessageDialog(null,"进程"+zhongzhi.get(count3 -1).getPID()+"已经完成！","提示",JOptionPane.PLAIN_MESSAGE);
+                            for(int i = 0;i<=16;i++){
+                                if(Objects.equals((String) table.getModel().getValueAt(i, 0), zhongzhi.get(count3 - 1).PID)) {
+                                    for(int j = 0;j<zhongzhi.get(count3-1).Memory;j++){
+                                        table.getModel().setValueAt("",i+j,0);
+                                        table.getModel().setValueAt("",i+j,1);
+                                        table.getModel().setValueAt("",i+j,2);
+                                    }
+                                    break;
+                                }
+                            }
+                            count6-=zhongzhi.get(count3-1).Memory;
+                            JOptionPane.showMessageDialog(null,"进程"+zhongzhi.get(count3 -1).getPID()+"已经完成！占用的内存已经释放！","提示",JOptionPane.PLAIN_MESSAGE);
                             textArea4.setText("");
                             textArea5.setText("");
                             textArea6.setText("");

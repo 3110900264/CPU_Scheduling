@@ -5,12 +5,14 @@ public class process {
     public String PID;
     public int Time;
     public int Rank;
+    public int Memory;
 
     public process(){}
-    public process(String PID,int Time, int Rank){
+    public process(String PID,int Time, int Rank,int Memory){
         this.PID = PID;
         this.Rank = Rank;//rank越小优先级越高
         this.Time = Time;
+        this.Memory = Memory;
     }
 
     public String getPID() {
@@ -30,6 +32,12 @@ public class process {
     }
     public void setRank(int rank) {
         Rank = rank;
+    }
+    public int getMemory() {
+        return Memory;
+    }
+    public void setMemory(int memory) {
+        Memory = memory;
     }
 
     public void run(process p){
